@@ -1,0 +1,5 @@
+﻿  task1.cpp
+  task2.cpp
+C:\Users\ABC\source\repos\DSAlab7\DSAlab7\task2.cpp(25,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  Generating Code...
+  DSAlab7.vcxproj -> C:\Users\ABC\source\repos\DSAlab7\x64\Debug\DSAlab7.exe

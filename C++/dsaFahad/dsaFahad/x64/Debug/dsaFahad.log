@@ -1,0 +1,5 @@
+﻿  Source.cpp
+C:\Users\ABC\source\repos\dsaFahad\dsaFahad\Source.cpp(102,7): warning C4101: 'choice': unreferenced local variable
+C:\Users\ABC\source\repos\dsaFahad\dsaFahad\Source.cpp(107,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1094,5): error MSB6006: "link.exe" exited with code 1168.
+LINK : fatal error LNK1168: cannot open C:\Users\ABC\source\repos\dsaFahad\x64\Debug\dsaFahad.exe for writing

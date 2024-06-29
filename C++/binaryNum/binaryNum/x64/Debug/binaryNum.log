@@ -1,0 +1,5 @@
+﻿  Source.cpp
+C:\Users\ABC\source\repos\binaryNum\binaryNum\Source.cpp(11,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\ABC\source\repos\binaryNum\binaryNum\Source.cpp(96,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\ABC\source\repos\binaryNum\binaryNum\Source.cpp(173,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  binaryNum.vcxproj -> C:\Users\ABC\source\repos\binaryNum\x64\Debug\binaryNum.exe

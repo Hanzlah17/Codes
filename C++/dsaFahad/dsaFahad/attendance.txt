@@ -1,0 +1,22 @@
+MONDAY
+ Name: aiman - Roll Number: 6708 Present1
+ Name: nimra - Roll Number: 6705 Present1
+TUESDAY
+ Name: aiman - Roll Number: 6708 Present2
+ Name: nimra - Roll Number: 6705 Absent
+WEDNESDAY
+ Name: aiman - Roll Number: 6708 Present3
+ Name: nimra - Roll Number: 6705 Present2
+THURSDAY
+ Name: aiman - Roll Number: 6708 Absent
+ Name: nimra - Roll Number: 6705 Present3
+FRIDAY
+ Name: aiman - Roll Number: 6708 Present4
+ Name: nimra - Roll Number: 6705 Present4
+SATURDAY
+ Name: aiman - Roll Number: 6708 Present5
+ Name: nimra - Roll Number: 6705 Present5
+HOLIDAYAYYAYYAYAY
+MONDAY
+ Name: aiman - Roll Number: 6708 Present6
+ Name: nimra - Roll Number: 6705 Present6

@@ -1,0 +1,10 @@
+﻿  laiba's.cpp
+C:\Users\ABC\Downloads\header.h(36,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\header.h(42,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\header.h(50,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\header.h(57,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\header.h(64,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\header.h(194,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\ABC\Downloads\header.h(296,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\ABC\Downloads\laiba's.cpp(45,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  laiba's.vcxproj -> C:\Users\ABC\source\repos\laiba's\x64\Debug\laiba's.exe

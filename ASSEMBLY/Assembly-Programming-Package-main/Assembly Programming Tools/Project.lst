@@ -1,0 +1,981 @@
+     1                                  [org 0x0100]
+     2 00000000 E93D07                  jmp start
+     3 00000003 0000                    tickcount: dw 0
+     4                                  score:
+     5 00000005 0000                     dw 0
+     6                                  seconds:
+     7 00000007 3C00                    dw 60
+     8                                  minutes:
+     9 00000009 0500                    dw 5
+    10                                  scor:
+    11 0000000B 2020202053434F5245-      db '    SCORE      ',0
+    11 00000014 20202020202000     
+    12                                   Tim:
+    13 0000001B 2020202054494D4520-      db '    TIME       ',0
+    13 00000024 20202020202000     
+    14                                   Nxtshape:
+    15 0000002B 202020202020202020-      db '         NEXT SHAPE          ',0
+    15 00000034 4E4558542053484150-
+    15 0000003D 452020202020202020-
+    15 00000046 202000             
+    16 00000049 00000000                oldisr: dd 0 
+    17                                  xcordinate:
+    18 0000004D 1E00                     dw 30
+    19                                   ycordinate:
+    20 0000004F 0200                     dw 2
+    21                                   randNum:
+    22 00000051 0000                     dw 0
+    23                                   oldrandNum:
+    24 00000053 0000                     dw 0
+    25 00000055 01                      valid: db 1
+    26 00000056 00                      cmpcolor: db 0
+    27 00000057 14                      rowNumber: db 20
+    28 00000058 00                      scroll: db 0
+    29                                   clearscreen:
+    30 00000059 50                       push ax
+    31 0000005A 06                       push es
+    32 0000005B 51                       push cx
+    33 0000005C 57                       push di
+    34 0000005D B9D007                   mov cx,2000
+    35 00000060 31FF                     xor di,di
+    36 00000062 B800B8                   mov ax,0xb800
+    37 00000065 8EC0                     mov es,ax
+    38 00000067 B82000                   mov ax,0x0020
+    39 0000006A FC                       cld 
+    40 0000006B F3AB                     rep stosw
+    41 0000006D 5F                       pop di
+    42 0000006E 59                       pop cx
+    43 0000006F 07                       pop es
+    44 00000070 58                       pop ax
+    45 00000071 C3                       ret
+    46                                   strlen:
+    47 00000072 55                       push bp
+    48 00000073 89E5                     mov bp,sp
+    49 00000075 06                       push es
+    50 00000076 51                       push cx
+    51 00000077 57                       push di
+    52 00000078 C47E04                   les di,[bp+4]
+    53 0000007B B9FFFF                   mov cx,0xffff
+    54 0000007E 30C0                     xor al,al
+    55 00000080 F2AE                     repne scasb
+    56 00000082 B8FFFF                   mov ax,0xffff
+    57 00000085 29C8                     sub ax,cx
+    58 00000087 48                       dec ax
+    59 00000088 5F                       pop di
+    60 00000089 59                       pop cx
+    61 0000008A 07                       pop es
+    62 0000008B 5D                       pop bp
+    63 0000008C C20400                   ret 4
+    64                                  ;This function will take attribiute and create a pattern based on value in ah at position di
+    65                                  MakeSquareWithBoundary:
+    66 0000008F 55                      push bp
+    67 00000090 89E5                    mov bp, sp
+    68 00000092 06                      push es
+    69 00000093 50                      push ax
+    70 00000094 52                      push dx
+    71 00000095 57                      push di
+    72 00000096 51                      push cx
+    73                                  
+    74 00000097 B800B8                  mov ax, 0xb800
+    75 0000009A 8EC0                    mov es, ax
+    76 0000009C BA0300                  mov dx, 3
+    77 0000009F 8A6604                  mov ah, [bp+4]
+    78 000000A2 B0DC                    mov al,0xdc  ;0xdc
+    79                                  
+    80                                  ; Draw the top boundary of the square
+    81 000000A4 B90300                  mov cx, 3
+    82 000000A7 F3AB                    rep stosw
+    83                                  ; Draw the bottom boundary of the square
+    84 000000A9 81C73A01                add di,314
+    85 000000AD B90300                  mov cx, 3
+    86 000000B0 F3AB                    rep stosw
+    87                                  ; Draw the sides of the square
+    88 000000B2 81EF4201                sub di,322
+    89 000000B6 B90200                  mov cx, 2
+    90 000000B9 B0DE                    mov al,0xde ;de
+    91 000000BB 81C79A00                add di,154
+    92                                  lrside:
+    93 000000BF 268905                  mov [es:di],ax
+    94 000000C2 83C706                  add di,6
+    95 000000C5 268905                  mov [es:di],ax
+    96 000000C8 81C79A00                add di,154
+    97 000000CC 49                      dec cx
+    98 000000CD 75F0                    jnz lrside
+    99 000000CF B0DB                    mov al,0xdb
+   100                                  
+   101                                  
+   102 000000D1 59                      pop cx
+   103 000000D2 5F                      pop di
+   104 000000D3 5A                      pop dx
+   105 000000D4 58                      pop ax
+   106 000000D5 07                      pop es
+   107 000000D6 5D                      pop bp
+   108 000000D7 C20200                  ret 2
+   109                                  ;different shapes
+   110                                  ;-----------
+   111                                  Line:
+   112 000000DA 55                      push bp
+   113 000000DB 89E5                    mov bp,sp
+   114 000000DD 57                      push di
+   115 000000DE 51                      push cx
+   116 000000DF 50                      push ax
+   117 000000E0 B90300                  mov cx,3
+   118 000000E3 8B4604                  mov ax,[bp+4]; color attribute
+   119                                  lineloop:
+   120 000000E6 50                      push ax
+   121 000000E7 E8A5FF                  call MakeSquareWithBoundary
+   122 000000EA 83C706                  add di,6
+   123 000000ED 49                      dec cx
+   124 000000EE 75F6                    jnz lineloop
+   125 000000F0 58                      pop ax
+   126 000000F1 59                      pop cx
+   127 000000F2 5F                      pop di
+   128 000000F3 5D                      pop bp
+   129 000000F4 C20200                  ret 2
+   130                                  ;---------
+   131                                  SingleSquare:
+   132 000000F7 55                      push bp
+   133 000000F8 89E5                    mov bp,sp
+   134 000000FA 50                      push ax
+   135 000000FB 8B4604                  mov ax,[bp+4]
+   136 000000FE 50                      push ax
+   137 000000FF E88DFF                  call MakeSquareWithBoundary
+   138 00000102 58                      pop ax
+   139 00000103 5D                      pop bp
+   140 00000104 C20200                  ret 2
+   141                                  ;---------------
+   142                                  Lshape:
+   143 00000107 57                      push di
+   144 00000108 50                      push ax
+   145 00000109 E8EBFF                  call SingleSquare
+   146 0000010C 50                      push ax
+   147 0000010D 81C74001                add di,320
+   148 00000111 E8C6FF                  call Line
+   149 00000114 5F                      pop di
+   150 00000115 C3                      ret
+   151                                  ;-----------------
+   152                                  TShape:
+   153 00000116 57                      push di
+   154 00000117 50                      push ax
+   155 00000118 E8BFFF                  call Line
+   156 0000011B 50                      push ax
+   157 0000011C 81C74601                add di,326
+   158 00000120 E8D4FF                  call SingleSquare
+   159 00000123 5F                      pop di 
+   160 00000124 C3                      ret
+   161                                  ;------------
+   162                                  DoubleLine:
+   163 00000125 57                      push di
+   164 00000126 50                      push ax
+   165 00000127 E8B0FF                  call Line
+   166 0000012A 81C74001                add di,320
+   167 0000012E 50                      push ax
+   168 0000012F E8A8FF                  call Line
+   169 00000132 5F                      pop di
+   170 00000133 C3                      ret 
+   171                                  ;-------------
+   172                                  Sqaure:
+   173 00000134 57                      push di
+   174 00000135 50                      push ax
+   175 00000136 E8BEFF                  call SingleSquare
+   176 00000139 83C706                  add di,6
+   177 0000013C 50                      push ax
+   178 0000013D E8B7FF                  call SingleSquare
+   179 00000140 83EF06                  sub di,6
+   180 00000143 81C74001                add di,320
+   181 00000147 50                      push ax
+   182 00000148 E8ACFF                  call SingleSquare
+   183 0000014B 83C706                  add di,6
+   184 0000014E 50                      push ax
+   185 0000014F E8A5FF                  call SingleSquare
+   186 00000152 5F                      pop di
+   187 00000153 C3                      ret
+   188                                  ;this function will make pattern based on number in ax at position passed as parameter
+   189                                  CreatePattern:
+   190 00000154 55                      push bp
+   191 00000155 89E5                    mov bp,sp
+   192 00000157 50                      push ax
+   193 00000158 51                      push cx
+   194 00000159 89C1                    mov cx,ax
+   195 0000015B 57                      push di
+   196 0000015C 56                      push si
+   197 0000015D 89FE                    mov si,di
+   198                                  ;;determining pattern 
+   199 0000015F 83F901                  cmp cx,1
+   200 00000162 7420                    je P1
+   201 00000164 83F902                  cmp cx,2
+   202 00000167 7436                    je P2
+   203 00000169 83F903                  cmp cx,3
+   204 0000016C 744C                    je P3
+   205 0000016E 83F904                  cmp cx,4
+   206 00000171 7471                    je P4
+   207 00000173 83F905                  cmp cx,5
+   208 00000176 0F848F00                je P5
+   209 0000017A 83F906                  cmp cx,6
+   210 0000017D 0F84C700                je P6
+   211 00000181 E9E900                  jmp exit
+   212                                  P1:
+   213 00000184 C606[5600]00            mov byte[cmpcolor],0 
+   214 00000189 E80B05                  call canMakeSquare
+   215 0000018C 803E[5500]00            cmp byte[valid],0
+   216 00000191 0F84D800                je exit
+   217 00000195 B80100                  mov ax,0x01
+   218 00000198 50                      push ax
+   219 00000199 E85BFF                  call SingleSquare
+   220 0000019C E9CE00                  jmp exit
+   221                                  P2:
+   222 0000019F C606[5600]00            mov byte[cmpcolor],0 
+   223 000001A4 E83205                  call PlaceLine
+   224 000001A7 803E[5500]00            cmp byte[valid],0
+   225 000001AC 0F84BD00                je exit
+   226 000001B0 B80400                  mov ax,0x04
+   227 000001B3 50                      push ax
+   228 000001B4 E823FF                  call Line
+   229 000001B7 E9B300                  jmp exit
+   230                                  P3:
+   231 000001BA C606[5600]00            mov byte[cmpcolor],0 
+   232 000001BF E8D504                  call canMakeSquare
+   233 000001C2 803E[5500]00            cmp byte[valid],0
+   234 000001C7 0F84A200                je exit
+   235 000001CB 81C64001                add si,320
+   236 000001CF E80705                  call PlaceLine
+   237 000001D2 803E[5500]00            cmp byte[valid],0
+   238 000001D7 0F849200                je exit
+   239 000001DB B80200                  mov ax,0x02
+   240 000001DE E826FF                  call Lshape
+   241 000001E1 E98900                  jmp exit
+   242                                  P4:
+   243 000001E4 C606[5600]00            mov byte[cmpcolor],0 
+   244 000001E9 E8ED04                  call PlaceLine
+   245 000001EC 803E[5500]00            cmp byte[valid],0
+   246 000001F1 747A                    je exit
+   247 000001F3 81C64001                add si,320
+   248 000001F7 E8DF04                  call PlaceLine
+   249 000001FA 803E[5500]00            cmp byte[valid],0
+   250 000001FF 746C                    je exit
+   251 00000201 B80300                  mov ax,0x03
+   252 00000204 E81EFF                  call DoubleLine
+   253 00000207 EB64                    jmp exit
+   254                                  P5:
+   255 00000209 C606[5600]00            mov byte[cmpcolor],0 
+   256 0000020E E88604                  call canMakeSquare
+   257 00000211 803E[5500]00            cmp byte[valid],0
+   258 00000216 7455                    je exit
+   259 00000218 83C606                  add si,6
+   260 0000021B E87904                  call canMakeSquare
+   261 0000021E 803E[5500]00            cmp byte[valid],0
+   262 00000223 7448                    je exit
+   263 00000225 81C63A01                add si,314
+   264 00000229 E86B04                  call canMakeSquare
+   265 0000022C 803E[5500]00            cmp byte[valid],0
+   266 00000231 743A                    je exit
+   267 00000233 83C606                  add si,6
+   268 00000236 E85E04                  call canMakeSquare
+   269 00000239 803E[5500]00            cmp byte[valid],0
+   270 0000023E 742D                    je exit
+   271 00000240 B80500                  mov ax,0x05
+   272 00000243 E8EEFE                  call Sqaure
+   273 00000246 EB25                    jmp exit
+   274                                  P6:
+   275 00000248 C606[5600]00            mov byte[cmpcolor],0 
+   276 0000024D E88904                  call PlaceLine
+   277 00000250 803E[5500]00            cmp byte[valid],0
+   278 00000255 7416                    je exit
+   279 00000257 81C64601                add si,326
+   280 0000025B E83904                  call canMakeSquare
+   281 0000025E 803E[5500]00            cmp byte[valid],0
+   282 00000263 7408                    je exit
+   283 00000265 B80600                  mov ax,0x06
+   284 00000268 E8ABFE                  call TShape
+   285 0000026B EB00                    jmp exit
+   286                                  exit:
+   287 0000026D 5E                      pop si
+   288 0000026E 5F                      pop di
+   289 0000026F 59                      pop cx
+   290 00000270 58                      pop ax
+   291 00000271 5D                      pop bp
+   292 00000272 C3                      ret 
+   293                                  CreateblackPattern:
+   294 00000273 55                      push bp
+   295 00000274 89E5                    mov bp,sp
+   296 00000276 50                      push ax
+   297 00000277 51                      push cx
+   298 00000278 57                      push di
+   299 00000279 89C1                    mov cx,ax
+   300 0000027B B80000                  mov ax,0
+   301                                  ;;determining pattern 
+   302 0000027E 83F901                  cmp cx,1
+   303 00000281 741B                    je Pb1
+   304 00000283 83F902                  cmp cx,2
+   305 00000286 741C                    je Pb2
+   306 00000288 83F903                  cmp cx,3
+   307 0000028B 741D                    je Pb3
+   308 0000028D 83F904                  cmp cx,4
+   309 00000290 741D                    je Pb4
+   310 00000292 83F905                  cmp cx,5
+   311 00000295 741D                    je Pb5
+   312 00000297 83F906                  cmp cx,6
+   313 0000029A 741D                    je Pb6
+   314 0000029C EB20                    jmp bexit
+   315                                  Pb1:
+   316 0000029E 50                      push ax
+   317 0000029F E855FE                  call SingleSquare
+   318 000002A2 EB1A                    jmp bexit
+   319                                  Pb2:
+   320 000002A4 50                      push ax
+   321 000002A5 E832FE                  call Line
+   322 000002A8 EB14                    jmp bexit
+   323                                  Pb3:
+   324 000002AA E85AFE                  call Lshape
+   325 000002AD EB0F                    jmp bexit
+   326                                  Pb4:
+   327 000002AF E873FE                  call DoubleLine
+   328 000002B2 EB0A                    jmp bexit
+   329                                  Pb5:
+   330 000002B4 E87DFE                  call Sqaure
+   331 000002B7 EB05                    jmp bexit
+   332                                  Pb6:
+   333 000002B9 E85AFE                  call TShape
+   334 000002BC EB00                    jmp bexit
+   335                                  bexit:
+   336 000002BE 5F                      pop di
+   337 000002BF 59                      pop cx
+   338 000002C0 58                      pop ax
+   339 000002C1 5D                      pop bp
+   340 000002C2 C3                      ret  
+   341                                  Printnumber: 
+   342 000002C3 55                      push bp
+   343 000002C4 89E5                    mov bp, sp
+   344 000002C6 06                      push es
+   345 000002C7 50                      push ax
+   346 000002C8 53                      push bx
+   347 000002C9 51                      push cx
+   348 000002CA 52                      push dx
+   349 000002CB 57                      push di
+   350 000002CC B800B8                  mov ax, 0xb800
+   351 000002CF 8EC0                    mov es, ax 
+   352 000002D1 8B4604                  mov ax, [bp+4] 
+   353 000002D4 BB0A00                  mov bx, 10 
+   354 000002D7 B90000                  mov cx, 0 
+   355                                  nextdigit: 
+   356 000002DA BA0000                  mov dx, 0 
+   357 000002DD F7F3                    div bx 
+   358 000002DF 80C230                  add dl, 0x30 
+   359 000002E2 52                      push dx 
+   360 000002E3 41                      inc cx 
+   361 000002E4 83F800                  cmp ax, 0 
+   362 000002E7 75F1                    jnz nextdigit 
+   363 000002E9 B050                    mov al, 80 
+   364 000002EB F66608                  mul byte [bp+8] 
+   365 000002EE 03460A                  add ax, [bp+10]
+   366 000002F1 D1E0                    shl ax, 1 
+   367 000002F3 89C7                    mov di,ax 
+   368                                  nextpos: 
+   369 000002F5 5A                      pop dx 
+   370 000002F6 8A7606                  mov dh, [bp+6] 
+   371 000002F9 268915                  mov [es:di], dx 
+   372 000002FC 83C702                  add di, 2 
+   373 000002FF E2F4                    loop nextpos 
+   374 00000301 5F                      pop di
+   375 00000302 5A                      pop dx
+   376 00000303 59                      pop cx
+   377 00000304 5B                      pop bx
+   378 00000305 58                      pop ax
+   379 00000306 07                      pop es
+   380 00000307 5D                      pop bp
+   381 00000308 C20800                  ret 8
+   382                                   PrintText:
+   383 0000030B 55                      	push bp
+   384 0000030C 89E5                    	mov bp, sp
+   385 0000030E 06                      	push es
+   386 0000030F 50                      	push ax
+   387 00000310 51                      	push cx
+   388 00000311 56                      	push si
+   389 00000312 57                      	push di
+   390 00000313 1E                      	push ds 
+   391 00000314 8B4604                  	mov ax, [bp+4]
+   392 00000317 50                      	push ax
+   393 00000318 E857FD                  	call strlen
+   394 0000031B 83F800                  	cmp ax, 0 
+   395 0000031E 741E                    	jz exitt
+   396 00000320 89C1                    	mov cx, ax 
+   397 00000322 B800B8                  	mov ax, 0xb800
+   398 00000325 8EC0                    	mov es, ax 
+   399 00000327 B050                    	mov al, 80 
+   400 00000329 F66608                  	mul byte [bp+8] 
+   401 0000032C 03460A                  	add ax, [bp+10]
+   402 0000032F D1E0                    	shl ax, 1 
+   403 00000331 89C7                    	mov di,ax 
+   404 00000333 8B7604                  	mov si, [bp+4] 
+   405 00000336 8A6606                  	mov ah, [bp+6] 
+   406 00000339 FC                      	cld 
+   407 0000033A AC                      	nextchar: lodsb 
+   408 0000033B AB                      	stosw 
+   409 0000033C E2FC                    	loop nextchar
+   410                                  	exitt:
+   411 0000033E 5F                      	pop di
+   412 0000033F 5E                      	pop si
+   413 00000340 59                      	pop cx
+   414 00000341 58                      	pop ax
+   415 00000342 07                      	pop es
+   416 00000343 5D                      	pop bp
+   417 00000344 C20800                  	ret 8
+   418                                  	
+   419                                  	CheckSingleRow:
+   420 00000347 06                      push es
+   421 00000348 50                      push ax
+   422 00000349 51                      push cx
+   423 0000034A 57                      push di
+   424 0000034B B800B8                  mov ax,0xb800
+   425 0000034E B050                    mov al, 80 
+   426 00000350 F626[5700]              mul byte [rowNumber] 
+   427 00000354 83C002                  add ax, 2
+   428 00000357 D1E0                    shl ax, 1 
+   429 00000359 89C7                    mov di,ax
+   430 0000035B B800B8                  mov ax,0xb800
+   431 0000035E 8EC0                    mov es,ax
+   432 00000360 B93000                  mov cx,48
+   433                                  rowcheck:
+   434 00000363 268B05                  mov ax,[es:di]
+   435 00000366 80FC00                  cmp ah,0x00
+   436 00000369 740C                    je nomatch
+   437 0000036B 83C702                  add di,2
+   438 0000036E E2F3                    loop rowcheck
+   439 00000370 C606[5800]01            mov byte[scroll],1
+   440 00000375 EB05                    jmp rExit
+   441                                  nomatch:
+   442 00000377 C606[5800]00            mov byte[scroll],0
+   443                                  rExit:
+   444 0000037C 5F                      pop di
+   445 0000037D 59                      pop cx
+   446 0000037E 58                      pop ax
+   447 0000037F 07                      pop es
+   448 00000380 C3                      ret
+   449                                  CheckLine:
+   450 00000381 50                      push ax
+   451 00000382 C606[5700]14            mov byte[rowNumber],20
+   452                                  loopline:
+   453 00000387 E8BDFF                  call CheckSingleRow
+   454 0000038A 803E[5800]01            cmp byte[scroll],1
+   455 0000038F 740E                    je scrollcase
+   456 00000391 802E[5700]04            sub byte[rowNumber],4
+   457 00000396 803E[5700]02            cmp byte[rowNumber],2
+   458 0000039B 7DEA                    jnl loopline
+   459 0000039D EB0E                    jmp chExit
+   460                                  scrollcase:
+   461 0000039F 8306[0500]0A            add word[score],10
+   462 000003A4 E85001                  call timedelay
+   463 000003A7 E84D01                  call timedelay
+   464 000003AA E80200                  call RemoveLine
+   465                                  
+   466                                  chExit:
+   467 000003AD 58                      pop ax
+   468 000003AE C3                      ret
+   469                                  
+   470                                  RemoveLine:
+   471 000003AF 51                      push cx
+   472 000003B0 B90400                  mov cx,4
+   473                                  removeLoop:
+   474 000003B3 E80400                  call scrolldown
+   475 000003B6 E2FB                    loop removeLoop
+   476 000003B8 59                      pop cx
+   477 000003B9 C3                      ret
+   478                                  scrolldown:
+   479 000003BA 50                      push ax
+   480 000003BB 51                      push cx
+   481 000003BC 56                      push si
+   482 000003BD 57                      push di
+   483 000003BE 06                      push es
+   484 000003BF 1E                      push ds
+   485 000003C0 BF260E                  mov di, 3622
+   486 000003C3 89FE                    mov si,di
+   487 000003C5 81EEA000                sub si,160
+   488 000003C9 B800B8                  mov ax,0xb800
+   489 000003CC 8EC0                    mov es,ax
+   490 000003CE 8ED8                    mov ds,ax
+   491                                  scrollloop1:
+   492 000003D0 B93200                  mov cx,50
+   493                                  scrollloop2:
+   494 000003D3 FD                      std
+   495 000003D4 F3A5                    rep movsw
+   496 000003D6 83EF3C                  sub di,60
+   497 000003D9 83EE3C                  sub si,60
+   498 000003DC 83FF3E                  cmp di,62
+   499 000003DF 7DEF                    jnl scrollloop1
+   500 000003E1 B93200                  mov cx,50
+   501 000003E4 BF0200                  mov di,2
+   502 000003E7 FC                      cld 
+   503 000003E8 B82007                  mov ax,0x0720
+   504 000003EB F3AB                    rep stosw
+   505 000003ED 1F                      pop ds
+   506 000003EE 07                      pop es
+   507 000003EF 5F                      pop di
+   508 000003F0 5E                      pop si
+   509 000003F1 59                      pop cx
+   510 000003F2 58                      pop ax
+   511 000003F3 C3                      ret 
+   512                                  PrintScore:
+   513 000003F4 50                       push ax
+   514 000003F5 B83700                   mov ax,55
+   515 000003F8 50                       push ax
+   516 000003F9 B80500                   mov ax,5
+   517 000003FC 50                       push ax
+   518 000003FD B80F00                   mov ax,0x0f ;color of text
+   519 00000400 50                       push ax
+   520 00000401 A1[0500]                 mov ax,[score]
+   521 00000404 50                       push ax
+   522 00000405 E8BBFE                   call Printnumber
+   523 00000408 58                       pop ax
+   524 00000409 C3                       ret
+   525                                   PrintTime:
+   526 0000040A 50                       push ax
+   527 0000040B 06                       push es
+   528 0000040C 833E[0900]00             cmp word[minutes],0
+   529 00000411 7442                     je timexit
+   530 00000413 833E[0700]00             cmp word[seconds],0
+   531 00000418 750A                    jne printingtime
+   532 0000041A FF0E[0900]              dec word[minutes]
+   533 0000041E C706[0700]3B00          mov word[seconds],59
+   534                                  printingtime:
+   535 00000424 B800B8                  mov ax,0xb800
+   536 00000427 8EC0                    mov es,ax
+   537 00000429 B40F                    mov ah,0x0f
+   538 0000042B B030                    mov al,'0'
+   539 0000042D 26A3A603                mov [es:934],ax
+   540 00000431 A1[0900]                mov ax,[minutes]
+   541 00000434 0430                    add al,0x30
+   542 00000436 B40F                    mov ah,0x0f
+   543 00000438 26A3A803                mov [es:936],ax
+   544 0000043C B03A                    mov al,':'
+   545 0000043E 26A3AA03                mov [es:938],ax
+   546 00000442 B84600                  mov ax,70
+   547 00000445 50                      push ax
+   548 00000446 B80500                  mov ax,5
+   549 00000449 50                      push ax
+   550 0000044A B80F00                  mov ax,0x0f ;color of text
+   551 0000044D 50                      push ax
+   552 0000044E A1[0700]                mov ax,[seconds]
+   553 00000451 50                      push ax
+   554 00000452 E86EFE                  call Printnumber 
+   555                                   timexit:
+   556 00000455 07                       pop es
+   557 00000456 58                       pop ax
+   558 00000457 C3                       ret
+   559                                   PrintScreen:
+   560 00000458 50                       push ax
+   561 00000459 06                       push es
+   562 0000045A 51                       push cx
+   563 0000045B 57                       push di
+   564 0000045C B95000                   mov cx,80
+   565 0000045F 31FF                     xor di,di
+   566 00000461 B800B8                   mov ax,0xb800
+   567 00000464 8EC0                     mov es,ax
+   568 00000466 B82077                   mov ax,0x7720 ;upper boundary attribute
+   569 00000469 FC                       cld 
+   570 0000046A F3AB                     rep stosw ;upper boundary
+   571 0000046C B95000                   mov cx,80
+   572 0000046F BF000F                   mov di,3840
+   573 00000472 B800B8                   mov ax,0xb800
+   574 00000475 8EC0                     mov es,ax
+   575 00000477 B82077                   mov ax,0x7720 ;lower boundary attribute
+   576 0000047A FC                       cld 
+   577 0000047B F3AB                     rep stosw ;lower boundary
+   578                                  
+   579 0000047D BF9E00                   mov di,158
+   580 00000480 B91700                   mov cx,23
+   581                                   next:
+   582 00000483 83C702                   add di,2
+   583 00000486 268905                   mov [es:di],ax ;left boundary 
+   584 00000489 81C79E00                 add di,158
+   585 0000048D 268905                   mov [es:di],ax ; right boundary
+   586 00000490 E2F1                     loop next 
+   587 00000492 BF0201                   mov di,258
+   588 00000495 B91700                   mov cx,23
+   589                                   ;mov ax,0x0020
+   590                                   middleline:
+   591 00000498 268905                   mov [es:di],ax ;middle boundary 
+   592 0000049B 81C7A000                 add di,160
+   593 0000049F E2F7                     loop middleline
+   594 000004A1 B91E00                   mov cx,30
+   595 000004A4 BFA406                   mov di,1700
+   596                                   ;mov ax,0x0020
+   597 000004A7 FC                       cld 
+   598 000004A8 F3AB                     rep stosw ;lower-half boundary
+   599 000004AA B90900                   mov cx,9
+   600 000004AD BF2201                   mov di,290
+   601                                   ;mov ax,0x0020
+   602                                   midhalf:
+   603 000004B0 268905                   mov [es:di],ax ;middle-half boundary 
+   604 000004B3 81C7A000                 add di,160
+   605 000004B7 E2F7                     loop midhalf
+   606                                   
+   607                                   ;printing score and timer label
+   608                                   ;score
+   609 000004B9 B83200                   mov ax,50
+   610 000004BC 50                       push ax
+   611 000004BD B80100                   mov ax,1
+   612 000004C0 50                       push ax
+   613 000004C1 B87F00                   mov ax,0x7f ;color of text
+   614 000004C4 50                       push ax
+   615 000004C5 B8[0B00]                 mov ax,scor
+   616 000004C8 50                       push ax
+   617 000004C9 E83FFE                   call PrintText
+   618                                   ;timer
+   619 000004CC B84200                   mov ax,66
+   620 000004CF 50                       push ax
+   621 000004D0 B80100                   mov ax,1
+   622 000004D3 50                       push ax
+   623 000004D4 B87F00                   mov ax,0x7f ;color of text
+   624 000004D7 50                       push ax
+   625 000004D8 B8[1B00]                 mov ax,Tim
+   626 000004DB 50                       push ax
+   627 000004DC E82CFE                   call PrintText
+   628                                   ;nextshape
+   629 000004DF B83200                   mov ax,50
+   630 000004E2 50                       push ax
+   631 000004E3 B80B00                   mov ax,11
+   632 000004E6 50                       push ax
+   633 000004E7 B87F00                   mov ax,0x7f ;color of text
+   634 000004EA 50                       push ax
+   635 000004EB B8[2B00]                 mov ax,Nxtshape
+   636 000004EE 50                       push ax
+   637 000004EF E819FE                   call PrintText
+   638 000004F2 5F                       pop di
+   639 000004F3 59                       pop cx
+   640 000004F4 07                       pop es
+   641 000004F5 58                       pop ax
+   642 000004F6 C3                       ret
+   643                                   ;-----------------------
+   644                                  timedelay:
+   645 000004F7 50                      push ax
+   646 000004F8 51                      push cx
+   647 000004F9 B9FFFF                  mov cx,0xffff
+   648                                  l1:
+   649 000004FC B80A00                  mov ax,10
+   650                                  l2:
+   651 000004FF 48                      dec ax
+   652 00000500 75FD                    jnz l2
+   653 00000502 49                      dec cx
+   654 00000503 75F7                    jnz l1
+   655 00000505 59                      pop cx
+   656 00000506 58                      pop ax
+   657 00000507 C3                      ret
+   658                                  Printtotal: 
+   659 00000508 55                      push bp
+   660 00000509 89E5                    mov bp, sp
+   661 0000050B 06                      push es
+   662 0000050C 50                      push ax
+   663 0000050D 53                      push bx
+   664 0000050E 51                      push cx
+   665 0000050F 52                      push dx
+   666 00000510 57                      push di
+   667 00000511 56                      push si
+   668 00000512 B800B8                  mov ax, 0xb800
+   669 00000515 8EC0                    mov es, ax 
+   670 00000517 A1[0500]                mov ax, [score] 
+   671 0000051A BB0A00                  mov bx, 10 
+   672 0000051D B90000                  mov cx, 0 
+   673                                  nextdig: 
+   674 00000520 BA0000                  mov dx, 0 
+   675 00000523 F7F3                    div bx 
+   676 00000525 80C230                  add dl, 0x30 
+   677 00000528 52                      push dx 
+   678 00000529 41                      inc cx 
+   679 0000052A 83F800                  cmp ax, 0 
+   680 0000052D 75F1                    jnz nextdig 
+   681 0000052F BF5005                  mov di,1360 ;position of score box
+   682 00000532 BEEC05                  mov si,1516 ;position of score digit
+   683                                  createb:
+   684 00000535 B87F00                  mov ax,0x007f	;color
+   685 00000538 50                      push ax
+   686 00000539 E853FB                  call MakeSquareWithBoundary
+   687 0000053C 83C604                  add si,4
+   688 0000053F 26C7042007              mov word[es:si], 0x0720
+   689 00000544 83C602                  add si,2
+   690 00000547 5A                      pop dx 
+   691 00000548 B60F                    mov dh,0x0f; color of score
+   692 0000054A 268914                  mov [es:si], dx 
+   693 0000054D 83C706                  add di,6
+   694 00000550 E2E3                    loop createb
+   695 00000552 5E                      pop si
+   696 00000553 5F                      pop di
+   697 00000554 5A                      pop dx
+   698 00000555 59                      pop cx
+   699 00000556 5B                      pop bx
+   700 00000557 58                      pop ax
+   701 00000558 07                      pop es
+   702 00000559 5D                      pop bp
+   703 0000055A C3                      ret
+   704                                  DisplayEnd:
+   705 0000055B 06                      push es
+   706 0000055C 50                      push ax
+   707 0000055D 51                      push cx
+   708 0000055E 52                      push dx
+   709 0000055F 57                      push di
+   710 00000560 E8F6FA                  call clearscreen
+   711 00000563 B800B8                  mov ax,0xb800
+   712 00000566 8EC0                    mov es,ax
+   713 00000568 B92800                  mov cx,40
+   714 0000056B BF9E02                  mov di,670
+   715 0000056E B8207F                  mov ax,0x7f20 ;upper
+   716 00000571 F3AB                    rep stosw
+   717 00000573 B8204B                  mov ax,0x4b20;inner
+   718 00000576 BA0900                  mov dx,9
+   719                                  inner:
+   720 00000579 83C778                  add di,120
+   721 0000057C B91400                  mov cx,20
+   722 0000057F F3AB                    rep stosw
+   723 00000581 4A                      dec dx
+   724 00000582 75F5                    jnz inner
+   725 00000584 B92800                  mov cx,40
+   726 00000587 BFDE08                  mov di,2270
+   727 0000058A B8207F                  mov ax,0x7f20;lower
+   728 0000058D F3AB                    rep stosw
+   729 0000058F E876FF                  call Printtotal
+   730                                  ;score
+   731 00000592 B82500                  mov ax,37
+   732 00000595 50                      push ax
+   733 00000596 B80600                  mov ax,6
+   734 00000599 50                      push ax
+   735 0000059A B8FF00                  mov ax,0xff ;color of text
+   736 0000059D 50                      push ax
+   737 0000059E B8[0B00]                mov ax,scor
+   738 000005A1 50                      push ax
+   739 000005A2 E866FD                  call PrintText
+   740 000005A5 BFE403                  mov di,996
+   741 000005A8 B90A00                  mov cx,10
+   742                                  nextitr:
+   743 000005AB B80100                  mov ax,1
+   744                                  nexts:
+   745 000005AE E8A3FB                  call CreatePattern
+   746 000005B1 E843FF                  call timedelay
+   747 000005B4 E8BCFC                  call CreateblackPattern
+   748 000005B7 BFE403                  mov di,996
+   749 000005BA 40                      inc ax
+   750 000005BB 83F807                  cmp ax,7
+   751 000005BE 75EE                    jnz nexts
+   752 000005C0 E2E9                    loop nextitr
+   753 000005C2 5F                      pop di
+   754 000005C3 5A                      pop dx
+   755 000005C4 59                      pop cx
+   756 000005C5 58                      pop ax
+   757 000005C6 07                      pop es
+   758 000005C7 C3                      ret
+   759                                  
+   760                                  ;; keyboard isr
+   761                                  kbisr:
+   762 000005C8 50                      push ax
+   763 000005C9 06                      push es
+   764 000005CA B800B8                  mov ax, 0xb800
+   765 000005CD 8EC0                    mov es, ax 
+   766 000005CF E460                    in al, 0x60 
+   767 000005D1 3C4B                    cmp al, 0x4b ;;scan code for left key
+   768 000005D3 7514                    jne nextcmp 
+   769 000005D5 833E[4D00]02            cmp word[xcordinate],2
+   770 000005DA 742B                    jz notmatch
+   771 000005DC E89F00                  call RemoveShape
+   772 000005DF 832E[4D00]02            sub word[xcordinate],2
+   773 000005E4 E80B01                  call MoveShape
+   774 000005E7 EB1E                    jmp notmatch 
+   775                                  nextcmp:
+   776 000005E9 3C4D                    cmp al, 0x4d ; scan code for right key
+   777 000005EB 751A                    jne notmatch
+   778 000005ED E88E00                  call RemoveShape
+   779 000005F0 8306[4D00]02            add word[xcordinate],2
+   780 000005F5 E8FA00                  call MoveShape
+   781 000005F8 803E[5500]00            cmp byte[valid],0
+   782 000005FD 7508                    jnz notmatch
+   783 000005FF 832E[4D00]02            sub word[xcordinate],2
+   784 00000604 E8EB00                  call MoveShape
+   785                                  notmatch: 
+   786 00000607 07                      pop es
+   787 00000608 58                      pop ax
+   788 00000609 2EFF2E[4900]            jmp far [cs:oldisr] 
+   789                                  ; timer interrupt service routine
+   790                                  timer: 
+   791 0000060E 50                      push ax
+   792 0000060F 2EFF06[0300]            inc word [cs:tickcount]; increment tick count
+   793 00000614 2E833E[0300]13          cmp word[cs:tickcount],19
+   794 0000061A 7C5C                    jl texit
+   795 0000061C 2EC706[0300]0000        mov word[cs:tickcount],0
+   796 00000623 2EFF0E[0700]            dec word[cs:seconds] 
+   797 00000628 E8DFFD                  call PrintTime
+   798 0000062B 2E833E[0900]00          cmp word[cs:minutes],0
+   799 00000631 7445                    je texit
+   800 00000633 E84800                  call RemoveShape
+   801 00000636 FF06[4F00]              inc word[ycordinate]
+   802 0000063A E8B500                  call MoveShape
+   803 0000063D 803E[5500]00            cmp byte[valid],0
+   804 00000642 7402                    je reset
+   805 00000644 EB32                    jmp texit
+   806                                  reset:
+   807 00000646 FF0E[4F00]              dec word[ycordinate]
+   808 0000064A 833E[4F00]02            cmp word[ycordinate],2
+   809 0000064F 0F844901                je gameEnd
+   810 00000653 E89C00                  call MoveShape
+   811 00000656 E828FD                  call CheckLine
+   812 00000659 C706[4F00]0200          mov word[ycordinate],2
+   813 0000065F C706[4D00]1E00          mov word[xcordinate],30
+   814 00000665 A1[5100]                mov ax,[randNum]
+   815 00000668 A3[5300]                mov [oldrandNum],ax
+   816 0000066B B80600                  mov ax,6
+   817 0000066E 50                      push ax
+   818 0000066F E89900                  call randGen
+   819 00000672 E8B200                  call PrintNextShape
+   820 00000675 BFD200                  mov di,210
+   821                                  texit:
+   822 00000678 B020                    mov al, 0x20
+   823 0000067A E620                    out 0x20, al ; end of interrupt
+   824 0000067C 58                      pop ax
+   825 0000067D CF                      iret 
+   826                                  RemoveShape:
+   827 0000067E 50                      push ax
+   828 0000067F 57                      push di
+   829 00000680 B050                    mov al, 80 
+   830 00000682 F626[4F00]              mul byte [ycordinate] 
+   831 00000686 0306[4D00]              add ax, [xcordinate]
+   832 0000068A D1E0                    shl ax, 1 
+   833 0000068C 89C7                    mov di,ax
+   834 0000068E A1[5300]                mov ax,[oldrandNum]
+   835 00000691 E8DFFB                  call CreateblackPattern
+   836 00000694 5F                      pop di
+   837 00000695 58                      pop ax
+   838 00000696 C3                      ret
+   839                                  canMakeSquare:
+   840 00000697 06                      push es
+   841 00000698 50                      push ax
+   842 00000699 51                      push cx
+   843 0000069A 57                      push di
+   844 0000069B 56                      push si
+   845 0000069C B800B8                  mov ax,0xb800
+   846 0000069F 8EC0                    mov es,ax
+   847                                  check1:
+   848 000006A1 B90300                  mov cx,3
+   849                                  c1:
+   850 000006A4 268B04                  mov ax,[es:si]
+   851 000006A7 3A26[5600]              cmp ah,[cmpcolor]
+   852 000006AB 7521                    jnz notValid
+   853 000006AD 83C602                  add si,2
+   854 000006B0 E2F2                    loop c1
+   855 000006B2 83EE06                  sub si,6
+   856                                  checkdown:
+   857 000006B5 B90200                  mov cx,2
+   858                                  c2:
+   859 000006B8 81C6A000                add si,160
+   860 000006BC 268B04                  mov ax,[es:si]
+   861 000006BF 3A26[5600]              cmp ah,[cmpcolor]
+   862 000006C3 7509                    jnz notValid
+   863 000006C5 E2F1                    loop c2
+   864 000006C7 C606[5500]01            mov byte[valid],1
+   865 000006CC EB05                    jmp checkexit
+   866                                  notValid:
+   867 000006CE C606[5500]00            mov byte[valid],0
+   868                                  checkexit:
+   869 000006D3 5E                      pop si
+   870 000006D4 5F                      pop di
+   871 000006D5 59                      pop cx
+   872 000006D6 58                      pop ax
+   873 000006D7 07                      pop es
+   874 000006D8 C3                      ret
+   875                                  PlaceLine:
+   876 000006D9 50                      push ax
+   877 000006DA 51                      push cx
+   878 000006DB 56                      push si
+   879 000006DC B90300                  mov cx,3
+   880                                  ploop:
+   881 000006DF E8B5FF                  call canMakeSquare
+   882 000006E2 803E[5500]00            cmp byte[valid],0
+   883 000006E7 7405                    je pexit
+   884 000006E9 83C606                  add si,6
+   885 000006EC E2F1                    loop ploop
+   886                                  pexit:
+   887 000006EE 5E                      pop si
+   888 000006EF 59                      pop cx
+   889 000006F0 58                      pop ax
+   890 000006F1 C3                      ret
+   891                                  MoveShape:
+   892 000006F2 50                      push ax
+   893 000006F3 57                      push di
+   894 000006F4 B050                    mov al, 80 
+   895 000006F6 F626[4F00]              mul byte [ycordinate] 
+   896 000006FA 0306[4D00]              add ax, [xcordinate]
+   897 000006FE D1E0                    shl ax, 1 
+   898 00000700 89C7                    mov di,ax
+   899 00000702 A1[5300]                mov ax,[oldrandNum]
+   900 00000705 E84CFA                  call CreatePattern
+   901 00000708 5F                      pop di
+   902 00000709 58                      pop ax
+   903 0000070A C3                      ret
+   904                                  randGen:
+   905 0000070B 55                              push bp
+   906 0000070C 89E5                            mov bp, sp
+   907 0000070E 51                              push cx
+   908 0000070F 52                              push dx
+   909 00000710 50                              push ax
+   910 00000711 0F31                            rdtsc                   
+   911 00000713 31D2                            xor dx,dx               
+   912 00000715 8B4E04                          mov cx, [bp + 4]
+   913 00000718 F7F1                            div cx                  
+   914 0000071A FEC2                    		inc dl
+   915 0000071C 8816[5100]              		mov [randNum], dl  
+   916 00000720 58                              pop ax
+   917 00000721 5A                              pop dx
+   918 00000722 59                              pop cx
+   919 00000723 5D                              pop bp
+   920                                  
+   921 00000724 C20200                          ret 2
+   922                                  ;;---------------------------------
+   923                                  PrintNextShape:
+   924 00000727 57                      push di
+   925 00000728 833E[0900]00            cmp word[minutes],0
+   926 0000072D 740F                    je nexit
+   927 0000072F BFD809                  mov di,2520
+   928 00000732 A1[5300]                mov ax,[oldrandNum]
+   929 00000735 E83BFB                  call CreateblackPattern
+   930 00000738 A1[5100]                mov ax,[randNum]
+   931 0000073B E816FA                  call CreatePattern
+   932                                  nexit:
+   933 0000073E 5F                      pop di
+   934 0000073F C3                      ret
+   935                                  ;;------------------------------------------------------------------------
+   936                                  start:
+   937 00000740 E816F9                  call clearscreen
+   938                                  ;;timer 
+   939 00000743 31C0                    xor ax, ax
+   940 00000745 8EC0                    mov es, ax 
+   941 00000747 FA                      cli 
+   942 00000748 26C7062000[0E06]        mov word [es:8*4], timer
+   943 0000074F 268C0E2200              mov [es:8*4+2], cs 
+   944 00000754 FB                      sti
+   945                                  
+   946                                  ;;left right key
+   947 00000755 31C0                    xor ax, ax
+   948 00000757 8EC0                    mov es, ax 
+   949 00000759 26A12400                mov ax, [es:9*4]
+   950 0000075D A3[4900]                mov [oldisr], ax 
+   951 00000760 26A12600                mov ax, [es:9*4+2]
+   952 00000764 A3[4B00]                mov [oldisr+2], ax 
+   953 00000767 FA                      cli 
+   954 00000768 26C7062400[C805]        mov word [es:9*4], kbisr 
+   955 0000076F 268C0E2600              mov [es:9*4+2], cs
+   956 00000774 FB                      sti
+   957 00000775 E8E0FC                  call PrintScreen
+   958 00000778 E879FC                  call PrintScore
+   959 0000077B B80600                  mov ax,6
+   960 0000077E 50                      push ax
+   961 0000077F E889FF                  call randGen
+   962 00000782 A1[5100]                mov ax,[randNum]
+   963 00000785 A3[5300]                mov word[oldrandNum],ax
+   964 00000788 B80600                  mov ax,6
+   965 0000078B 50                      push ax
+   966 0000078C E87CFF                  call randGen
+   967 0000078F E895FF                  call PrintNextShape 
+   968 00000792 BFD200                  mov di,210
+   969                                  label1:
+   970 00000795 833E[0900]00            cmp word[minutes],0
+   971 0000079A 75F9                    jnz label1
+   972                                  gameEnd:
+   973 0000079C E8BAF8                  call clearscreen
+   974 0000079F E8B9FD                  call DisplayEnd
+   975 000007A2 B8004C                  mov ax,0x4c00
+   976 000007A5 CD21                    int 21h

@@ -1,0 +1,3 @@
+﻿  Source1.cpp
+C:\Users\ABC\source\repos\assignment6\assignment6\Source1.cpp(121,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  assignment6.vcxproj -> C:\Users\ABC\source\repos\assignment6\x64\Debug\assignment6.exe

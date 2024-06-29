@@ -1,0 +1,3 @@
+﻿  22L6844.cpp
+C:\Users\ABC\source\repos\DSlab8\DSlab8\22L6844.cpp(160,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  DSlab8.vcxproj -> C:\Users\ABC\source\repos\DSlab8\x64\Debug\DSlab8.exe

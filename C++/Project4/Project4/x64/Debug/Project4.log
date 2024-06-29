@@ -1,0 +1,13 @@
+﻿  message.cpp
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(40,34): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(40,37): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(82,34): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(82,37): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(124,34): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(124,37): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(161,34): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(161,39): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(170,19): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(181,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\ABC\source\repos\Project4\Project4\message.cpp(242,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Project4.vcxproj -> C:\Users\ABC\source\repos\Project4\x64\Debug\Project4.exe

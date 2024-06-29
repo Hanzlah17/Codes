@@ -1,0 +1,3 @@
+﻿  number detector.cpp
+C:\Users\ABC\source\repos\determining function\determining function\number detector.cpp(66,8): warning C4101: 'm': unreferenced local variable
+  determining function.vcxproj -> C:\Users\ABC\source\repos\determining function\x64\Debug\determining function.exe

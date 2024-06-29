@@ -1,0 +1,3 @@
+﻿  searchingname.cpp
+C:\Users\ABC\source\repos\arrays2D\arrays2D\searchingname.cpp(19,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  arrays2D.vcxproj -> C:\Users\ABC\source\repos\arrays2D\x64\Debug\arrays2D.exe

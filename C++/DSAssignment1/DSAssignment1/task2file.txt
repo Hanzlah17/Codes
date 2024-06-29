@@ -1,0 +1,10 @@
+block1
+700
+block2
+50
+block3
+10
+block4
+80
+block5
+500

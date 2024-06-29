@@ -1,0 +1,6 @@
+﻿  22l-6844.cpp
+C:\Users\ABC\Downloads\help.h(36,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\help.h(42,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\help.h(50,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\Downloads\help.h(57,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+  sample.vcxproj -> C:\Users\ABC\source\repos\sample\x64\Debug\sample.exe

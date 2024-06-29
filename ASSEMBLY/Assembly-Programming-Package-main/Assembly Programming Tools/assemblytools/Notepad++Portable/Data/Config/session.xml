@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="1">
+            <File firstVisibleLine="652" xOffset="0" scrollWidth="1106" startPos="8107" endPos="8251" selMode="0" offset="0" wrapCount="1" lang="Assembly" encoding="-1" userReadOnly="no" filename="F:\ASSEMBLY\Assembly-Programming-Package-main\Assembly Programming Tools\Project.asm" backupFilePath="" originalFileLastModifTimestamp="1795290577" originalFileLastModifTimestampHigh="31082996" tabColourId="-1" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="512" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="39" xOffset="0" scrollWidth="3861" startPos="91" endPos="91" selMode="0" offset="0" wrapCount="1" lang="Assembly" encoding="-1" userReadOnly="no" filename="F:\ASSEMBLY\Assembly-Programming-Package-main\Assembly Programming Tools\myCode1.asm" backupFilePath="" originalFileLastModifTimestamp="-1117017866" originalFileLastModifTimestampHigh="31106390" tabColourId="-1" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="512" mapWrapIndentMode="-1" mapIsWrap="no" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>

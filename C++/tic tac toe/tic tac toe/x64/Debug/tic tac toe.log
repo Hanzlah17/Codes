@@ -1,0 +1,10 @@
+﻿  chat's.cpp
+  tic tac toe.cpp
+C:\Users\ABC\source\repos\tic tac toe\tic tac toe\mstream.h(241,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\source\repos\tic tac toe\tic tac toe\mstream.h(248,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\source\repos\tic tac toe\tic tac toe\mstream.h(257,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\source\repos\tic tac toe\tic tac toe\mstream.h(265,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\source\repos\tic tac toe\tic tac toe\mstream.h(273,24): warning C4244: '=': conversion from 'SHORT' to 'char', possible loss of data
+C:\Users\ABC\source\repos\tic tac toe\tic tac toe\tic tac toe.cpp(4,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  Generating Code...
+  tic tac toe.vcxproj -> C:\Users\ABC\source\repos\tic tac toe\x64\Debug\tic tac toe.exe

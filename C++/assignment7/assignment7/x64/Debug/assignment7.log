@@ -1,0 +1,3 @@
+﻿  22l-6844.cpp
+C:\Users\ABC\source\repos\assignment7\assignment7\22l-6844.cpp(175,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  assignment7.vcxproj -> C:\Users\ABC\source\repos\assignment7\x64\Debug\assignment7.exe

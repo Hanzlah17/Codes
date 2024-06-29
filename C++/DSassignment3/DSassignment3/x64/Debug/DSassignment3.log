@@ -1,0 +1,5 @@
+﻿  22l6844.cpp
+C:\Users\ABC\source\repos\DSassignment3\DSassignment3\22l6844.cpp(367,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\ABC\source\repos\DSassignment3\DSassignment3\22l6844.cpp(492,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\ABC\source\repos\DSassignment3\DSassignment3\22l6844.cpp(719,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  DSassignment3.vcxproj -> C:\Users\ABC\source\repos\DSassignment3\x64\Debug\DSassignment3.exe

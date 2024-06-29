@@ -1,0 +1,191 @@
+     1                                  [org 0x0100]
+     2 00000000 E95901                  jmp start
+     3                                  width:
+     4 00000003 1E00                    dw 30 ;;change to change size of rectangle
+     5                                  length:
+     6 00000005 0C00                    dw 12
+     7                                  tickcount: 
+     8 00000007 0000                    dw 0
+     9                                  seconds: 
+    10 00000009 0000                    dw 0
+    11                                  shiftFlag: 
+    12 0000000B 0100                    dw 1
+    13                                  oldisr: 
+    14 0000000D 00000000                dd 0
+    15                                  clearscreen:
+    16 00000011 50                      push ax
+    17 00000012 06                      push es
+    18 00000013 51                      push cx
+    19 00000014 57                      push di
+    20 00000015 B9D007                  mov cx,2000
+    21 00000018 31FF                    xor di,di
+    22 0000001A B800B8                  mov ax,0xb800
+    23 0000001D 8EC0                    mov es,ax
+    24 0000001F B82007                  mov ax,0x0720
+    25 00000022 FC                      cld 
+    26 00000023 F3AB                    rep stosw
+    27 00000025 5F                      pop di
+    28 00000026 59                      pop cx
+    29 00000027 07                      pop es
+    30 00000028 58                      pop ax
+    31 00000029 C3                      ret
+    32                                  PrintRectangle:
+    33 0000002A 06                      push es
+    34 0000002B 50                      push ax
+    35 0000002C 51                      push cx
+    36 0000002D 57                      push di
+    37 0000002E 56                      push si
+    38 0000002F B800B8                  mov ax,0xb800
+    39 00000032 8EC0                    mov es,ax
+    40 00000034 B40F                    mov ah,0x0f
+    41 00000036 B041                    mov al,'A'
+    42 00000038 8B0E[0300]              mov cx,[width]
+    43 0000003C BF0802                  mov di,520
+    44                                  upperrow:
+    45 0000003F 268905                  mov [es:di],ax
+    46 00000042 FEC0                    inc al
+    47 00000044 3C5B                    cmp al,'[' ;;character after Z
+    48 00000046 7502                    jne nochange1
+    49 00000048 B041                    mov al,'A' ;;so that A is printed after Z if width is greater than 26
+    50                                  nochange1:
+    51 0000004A 83C702                  add di,2
+    52 0000004D E2F0                    loop upperrow
+    53 0000004F B061                    mov al,'a'
+    54 00000051 8B0E[0500]              mov cx,[length]
+    55 00000055 89FE                    mov si,di ;;mov si to right side of rectangle
+    56 00000057 81C69E00                add si,158 ;;mov to next line
+    57 0000005B BFA802                  mov di,680 ;;mov to next line
+    58                                  sides:
+    59 0000005E 268905                  mov [es:di],ax  ;;print left side
+    60 00000061 268904                  mov [es:si],ax  ;;print right side
+    61 00000064 81C7A000                add di,160
+    62 00000068 81C6A000                add si,160
+    63 0000006C FEC0                    inc al
+    64 0000006E E2EE                    loop sides
+    65 00000070 B041                    mov al,'A'
+    66 00000072 8B0E[0300]              mov cx,[width]
+    67                                  lowerrow:
+    68 00000076 268904                  mov [es:si],ax
+    69 00000079 FEC0                    inc al
+    70 0000007B 3C5B                    cmp al,'[' ;;character after Z
+    71 0000007D 7502                    jne nochange2
+    72 0000007F B041                    mov al,'A' ;;so that A is printed after Z if width is greater than 26
+    73                                  nochange2:
+    74 00000081 83EE02                  sub si,2
+    75 00000084 E2F0                    loop lowerrow
+    76 00000086 5E                      pop si
+    77 00000087 5F                      pop di
+    78 00000088 59                      pop cx
+    79 00000089 58                      pop ax
+    80 0000008A 07                      pop es
+    81 0000008B C3                      ret
+    82                                  ShiftRectangle:
+    83 0000008C 06                      push es
+    84 0000008D 50                      push ax
+    85 0000008E 53                      push bx
+    86 0000008F 51                      push cx
+    87 00000090 56                      push si
+    88 00000091 57                      push di
+    89 00000092 B800B8                  mov ax,0xb800
+    90 00000095 8EC0                    mov es,ax
+    91 00000097 BFA802                  mov di,680
+    92 0000009A 268B1D                  mov bx,[es:di] ;;rotation starting from left side (clockwise)
+    93 0000009D BF0802                  mov di,520
+    94 000000A0 89D8                    mov ax,bx
+    95 000000A2 2E8B0E[0300]            mov cx,[cs:width]
+    96                                  shiftrow1:
+    97 000000A7 268B1D                  mov bx,[es:di]
+    98 000000AA 268905                  mov [es:di],ax
+    99 000000AD 83C702                  add di,2
+   100 000000B0 89D8                    mov ax,bx
+   101 000000B2 E2F3                    loop shiftrow1
+   102 000000B4 81C79E00                add di,158
+   103 000000B8 89D8                    mov ax,bx
+   104 000000BA 2E8B0E[0500]            mov cx,[cs:length]
+   105                                  shiftRside:
+   106 000000BF 268B1D                  mov bx,[es:di]
+   107 000000C2 268905                  mov [es:di],ax
+   108 000000C5 81C7A000                add di,160
+   109 000000C9 89D8                    mov ax,bx
+   110 000000CB E2F2                    loop shiftRside
+   111 000000CD 89D8                    mov ax,bx
+   112 000000CF 2E8B0E[0300]            mov cx,[cs:width]
+   113                                  shiftrow2:
+   114 000000D4 268B1D                  mov bx,[es:di]
+   115 000000D7 268905                  mov [es:di],ax
+   116 000000DA 83EF02                  sub di,2
+   117 000000DD 89D8                    mov ax,bx
+   118 000000DF E2F3                    loop shiftrow2
+   119 000000E1 81EF9E00                sub di,158
+   120 000000E5 89D8                    mov ax,bx
+   121 000000E7 2E8B0E[0500]            mov cx,[cs:length]
+   122                                  shiftLside:
+   123 000000EC 268B1D                  mov bx,[es:di]
+   124 000000EF 268905                  mov [es:di],ax
+   125 000000F2 81EFA000                sub di,160
+   126 000000F6 89D8                    mov ax,bx
+   127 000000F8 E2F2                    loop shiftLside
+   128 000000FA 5F                      pop di
+   129 000000FB 5E                      pop si
+   130 000000FC 59                      pop cx
+   131 000000FD 5B                      pop bx
+   132 000000FE 58                      pop ax
+   133 000000FF 07                      pop es
+   134 00000100 C3                      ret
+   135                                  ; timer interrupt service routine
+   136                                  timer: 
+   137 00000101 50                      push ax
+   138 00000102 2EFF06[0700]            inc word [cs:tickcount]
+   139 00000107 2E833E[0700]12          cmp word [cs:tickcount],18
+   140 0000010D 7C26                    jnge texit
+   141 0000010F 2EFF06[0900]            inc word [cs:seconds]
+   142 00000114 2EC706[0700]0000        mov word [cs:tickcount],0
+   143 0000011B 2E833E[0900]02          cmp word [cs:seconds],2  ;;call shift after 2 seconds
+   144 00000121 7512                    jne texit
+   145 00000123 2EC706[0900]0000        mov word [cs:seconds],0
+   146 0000012A 2E833E[0B00]00          cmp word [cs:shiftFlag],0
+   147 00000130 7403                    je texit ;;if user has paused the shift
+   148 00000132 E857FF                  call ShiftRectangle
+   149                                  texit:
+   150 00000135 B020                    mov al, 0x20
+   151 00000137 E620                    out 0x20, al ; end of interrupt
+   152 00000139 58                      pop ax
+   153 0000013A CF                      iret ; return from interrupt
+   154                                  ;;;;;---------------------------------------------
+   155                                  ; keyboard interrupt service routine
+   156                                  kbisr: 
+   157 0000013B 50                      push ax
+   158 0000013C E460                    in al, 0x60 ; read a char from keyboard port
+   159 0000013E 3C19                    cmp al, 0x19 ;; if P is pressed
+   160 00000140 7509                    jne nextcmp 
+   161 00000142 2EC706[0B00]0000        mov word [cs:shiftFlag],0 ;;disable shift
+   162 00000149 EB0B                    jmp nomatch
+   163                                  nextcmp: 
+   164 0000014B 3C13                    cmp al, 0x13 ;; if R is pressed
+   165 0000014D 7507                    jne nomatch 
+   166 0000014F 2EC706[0B00]0100        mov word [cs:shiftFlag],1  ;;enable shift
+   167                                  nomatch: 
+   168 00000156 58                      pop ax
+   169 00000157 2EFF2E[0D00]            jmp far [cs:oldisr] ; call the original ISR
+   170                                  start:
+   171 0000015C E8B2FE                  call clearscreen
+   172 0000015F E8C8FE                  call PrintRectangle
+   173 00000162 31C0                    xor ax, ax
+   174 00000164 8EC0                    mov es, ax 
+   175 00000166 FA                      cli 
+   176 00000167 26C7062000[0101]        mov word [es:8*4], timer
+   177 0000016E 268C0E2200              mov [es:8*4+2], cs 
+   178 00000173 FB                      sti 
+   179                                  
+   180 00000174 31C0                    xor ax, ax
+   181 00000176 8EC0                    mov es, ax 
+   182 00000178 26A12400                mov ax, [es:9*4]
+   183 0000017C A3[0D00]                mov [oldisr], ax 
+   184 0000017F 26A12600                mov ax, [es:9*4+2]
+   185 00000183 A3[0F00]                mov [oldisr+2], ax 
+   186 00000186 FA                      cli 
+   187 00000187 26C7062400[3B01]        mov word [es:9*4], kbisr 
+   188 0000018E 268C0E2600              mov [es:9*4+2], cs 
+   189 00000193 FB                      sti
+   190 00000194 B8004C                  mov ax, 0x4c00 
+   191 00000197 CD21                    int 0x21
