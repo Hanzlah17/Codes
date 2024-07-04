@@ -1,0 +1,229 @@
+     1                                  [org 0x0100]
+     2 00000000 E99B00                  jmp start
+     3                                  input:
+     4 00000003 456E7465722061206E-     db 'Enter a number:'
+     4 0000000C 756D6265723A       
+     5                                  sum:
+     6 00000012 53756D3D20              db 'Sum= '
+     7                                  Dif:
+     8 00000017 446966666572656E63-     db 'Difference= '
+     8 00000020 653D20             
+     9                                  Pro:
+    10 00000023 50726F647563743D20      db 'Product= '
+    11                                  Divide:
+    12 0000002C 4469766973696F6E3D-     db 'Division= '
+    12 00000035 20                 
+    13                                  num1:
+    14 00000036 0000                    dw 0
+    15                                  num2:
+    16 00000038 0000                    dw 0
+    17                                  temp:
+    18 0000003A 0000                    dw 0
+    19                                  clearscreen:
+    20 0000003C 06                      push es
+    21 0000003D 50                      push ax
+    22 0000003E 51                      push cx
+    23 0000003F 57                      push di
+    24 00000040 B800B8                  mov ax,0xb800
+    25 00000043 8EC0                    mov es,ax
+    26 00000045 BF0000                  mov di,0
+    27 00000048 B82007                  mov ax,0x0720
+    28 0000004B B9D007                  mov cx,2000
+    29 0000004E FC                      cld
+    30 0000004F F3AB                    rep stosw
+    31 00000051 5F                      pop di
+    32 00000052 59                      pop cx
+    33 00000053 58                      pop ax
+    34 00000054 07                      pop es
+    35 00000055 C3                      ret
+    36                                  Printnumber: 
+    37 00000056 55                      push bp
+    38 00000057 89E5                    mov bp, sp
+    39 00000059 06                      push es
+    40 0000005A 50                      push ax
+    41 0000005B 53                      push bx
+    42 0000005C 51                      push cx
+    43 0000005D 52                      push dx
+    44 0000005E 57                      push di
+    45 0000005F B800B8                  mov ax, 0xb800
+    46 00000062 8EC0                    mov es, ax 
+    47 00000064 8B4604                  mov ax, [bp+4] 
+    48 00000067 BB0A00                  mov bx, 10 
+    49 0000006A B90000                  mov cx, 0 
+    50                                  nextdigit: 
+    51 0000006D BA0000                  mov dx, 0 
+    52 00000070 F7F3                    div bx 
+    53 00000072 80C230                  add dl, 0x30 
+    54 00000075 52                      push dx 
+    55 00000076 41                      inc cx 
+    56 00000077 83F800                  cmp ax, 0 
+    57 0000007A 75F1                    jnz nextdigit 
+    58 0000007C B050                    mov al, 80 
+    59 0000007E F66608                  mul byte [bp+8] 
+    60 00000081 03460A                  add ax, [bp+10]
+    61 00000084 D1E0                    shl ax, 1 
+    62 00000086 89C7                    mov di,ax 
+    63                                  nextpos: 
+    64 00000088 5A                      pop dx 
+    65 00000089 8A7606                  mov dh, [bp+6] 
+    66 0000008C 268915                  mov [es:di], dx 
+    67 0000008F 83C702                  add di, 2 
+    68 00000092 E2F4                    loop nextpos 
+    69 00000094 5F                      pop di
+    70 00000095 5A                      pop dx
+    71 00000096 59                      pop cx
+    72 00000097 5B                      pop bx
+    73 00000098 58                      pop ax
+    74 00000099 07                      pop es
+    75 0000009A 5D                      pop bp
+    76 0000009B C20800                  ret 8
+    77                                  start:
+    78 0000009E E89BFF                  call clearscreen
+    79                                  ;;-------------
+    80                                  ;;interept for printing
+    81 000000A1 B413                    mov ah, 0x13 
+    82 000000A3 B000                    mov al, 0 
+    83 000000A5 B700                    mov bh, 0
+    84 000000A7 B30F                    mov bl, 15 
+    85 000000A9 31D2                    xor dx,dx 
+    86 000000AB B90F00                  mov cx, 15 
+    87 000000AE 0E                      push cs
+    88 000000AF 07                      pop es 
+    89 000000B0 BD[0300]                mov bp, input 
+    90 000000B3 CD10                    int 0x10 
+    91                                  ;;----------
+    92 000000B5 B800B8                  mov ax,0xb800
+    93 000000B8 8EC0                    mov es,ax
+    94 000000BA BF2000                  mov di,32
+    95 000000BD B400                    mov ah,0
+    96 000000BF CD16                    int 16h
+    97 000000C1 2C30                    sub al,0x30
+    98 000000C3 A2[3600]                mov [num1],al
+    99 000000C6 0430                    add al,0x30
+   100 000000C8 B40F                    mov ah,0x0f
+   101 000000CA 268905                  mov [es:di],ax
+   102                                  ;;interept for printing
+   103 000000CD B413                    mov ah, 0x13 
+   104 000000CF B000                    mov al, 0 
+   105 000000D1 B700                    mov bh, 0
+   106 000000D3 B30F                    mov bl, 15 
+   107 000000D5 BA0001                  mov dx,0x0100
+   108 000000D8 B90F00                  mov cx, 15 
+   109 000000DB 0E                      push cs
+   110 000000DC 07                      pop es 
+   111 000000DD BD[0300]                mov bp, input 
+   112 000000E0 CD10                    int 0x10 
+   113                                  ;;----------
+   114 000000E2 B800B8                  mov ax,0xb800
+   115 000000E5 8EC0                    mov es,ax
+   116 000000E7 BFC000                  mov di,192
+   117                                  cin:
+   118 000000EA B400                    mov ah,0
+   119 000000EC CD16                    int 16h
+   120 000000EE 2C30                    sub al,0x30
+   121 000000F0 3C00                    cmp al,0
+   122 000000F2 74F6                    jz cin
+   123 000000F4 A2[3800]                mov [num2],al
+   124 000000F7 0430                    add al,0x30
+   125 000000F9 B40F                    mov ah,0x0f
+   126 000000FB 268905                  mov [es:di],ax
+   127                                  ;;-----------------
+   128 000000FE A1[3600]                mov ax,[num1]
+   129 00000101 0306[3800]              add ax,[num2]
+   130 00000105 A3[3A00]                mov [temp],ax
+   131 00000108 B413                    mov ah, 0x13 
+   132 0000010A B000                    mov al, 0 
+   133 0000010C B700                    mov bh, 0
+   134 0000010E B30F                    mov bl, 15 
+   135 00000110 BA0002                  mov dx,0x0200 
+   136 00000113 B90500                  mov cx, 5
+   137 00000116 0E                      push cs
+   138 00000117 07                      pop es 
+   139 00000118 BD[1200]                mov bp, sum 
+   140 0000011B CD10                    int 0x10
+   141                                  ;;
+   142 0000011D B80500                  mov ax,5
+   143 00000120 50                      push ax
+   144 00000121 B80200                  mov ax,2
+   145 00000124 50                      push ax
+   146 00000125 B80F00                  mov ax,0x0f
+   147 00000128 50                      push ax
+   148 00000129 A1[3A00]                mov ax,[temp]
+   149 0000012C 50                      push ax
+   150 0000012D E826FF                  call Printnumber
+   151                                  ;;--------------
+   152 00000130 A1[3600]                mov ax,[num1]
+   153 00000133 2B06[3800]              sub ax,[num2]
+   154 00000137 A3[3A00]                mov [temp],ax
+   155 0000013A B413                    mov ah, 0x13 
+   156 0000013C B000                    mov al, 0 
+   157 0000013E B700                    mov bh, 0
+   158 00000140 B30F                    mov bl, 15 
+   159 00000142 BA0003                  mov dx,0x0300 
+   160 00000145 B90B00                  mov cx, 11
+   161 00000148 0E                      push cs
+   162 00000149 07                      pop es 
+   163 0000014A BD[1700]                mov bp, Dif 
+   164 0000014D CD10                    int 0x10
+   165                                  ;;
+   166 0000014F B80C00                  mov ax,12
+   167 00000152 50                      push ax
+   168 00000153 B80300                  mov ax,3
+   169 00000156 50                      push ax
+   170 00000157 B80F00                  mov ax,0x0f
+   171 0000015A 50                      push ax
+   172 0000015B A1[3A00]                mov ax,[temp]
+   173 0000015E 50                      push ax
+   174 0000015F E8F4FE                  call Printnumber
+   175                                  ;;--------------
+   176 00000162 A1[3600]                mov ax,[num1]
+   177 00000165 F626[3800]              mul byte [num2]
+   178 00000169 A3[3A00]                mov [temp],ax
+   179 0000016C B413                    mov ah, 0x13 
+   180 0000016E B000                    mov al, 0 
+   181 00000170 B700                    mov bh, 0
+   182 00000172 B30F                    mov bl, 15 
+   183 00000174 BA0004                  mov dx,0x0400 
+   184 00000177 B90800                  mov cx, 8
+   185 0000017A 0E                      push cs
+   186 0000017B 07                      pop es 
+   187 0000017C BD[2300]                mov bp, Pro
+   188 0000017F CD10                    int 0x10
+   189                                  ;;
+   190 00000181 B80900                  mov ax,9
+   191 00000184 50                      push ax
+   192 00000185 B80400                  mov ax,4
+   193 00000188 50                      push ax
+   194 00000189 B80F00                  mov ax,0x0f
+   195 0000018C 50                      push ax
+   196 0000018D A1[3A00]                mov ax,[temp]
+   197 00000190 50                      push ax
+   198 00000191 E8C2FE                  call Printnumber
+   199                                  ;---------
+   200 00000194 A1[3600]                mov ax,[num1]
+   201 00000197 F636[3800]              div byte [num2]
+   202 0000019B A2[3A00]                mov [temp],al
+   203 0000019E A3[3A00]                mov [temp],ax
+   204 000001A1 B413                    mov ah, 0x13 
+   205 000001A3 B000                    mov al, 0 
+   206 000001A5 B700                    mov bh, 0
+   207 000001A7 B30F                    mov bl, 15 
+   208 000001A9 BA0005                  mov dx,0x0500 
+   209 000001AC B90900                  mov cx, 9
+   210 000001AF 0E                      push cs
+   211 000001B0 07                      pop es 
+   212 000001B1 BD[2C00]                mov bp, Divide
+   213 000001B4 CD10                    int 0x10
+   214                                  ;;
+   215 000001B6 B80A00                  mov ax,10
+   216 000001B9 50                      push ax
+   217 000001BA B80500                  mov ax,5
+   218 000001BD 50                      push ax
+   219 000001BE B80F00                  mov ax,0x0f
+   220 000001C1 50                      push ax
+   221 000001C2 A1[3A00]                mov ax,[temp]
+   222 000001C5 50                      push ax
+   223 000001C6 E88DFE                  call Printnumber
+   224 000001C9 B8004C                  mov ax,0x4c00
+   225                                  
+   226 000001CC CD21                    int 21h
